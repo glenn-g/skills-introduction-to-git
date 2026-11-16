@@ -38,6 +38,9 @@ let currentPiece = null;
 let currentX = 0;
 let currentY = 0;
 let score = 0;
+let highScore = 0;
+let level = 1;
+let patternsCleared = 0;
 let gameOver = false;
 let isPaused = false;
 let dropCounter = 0;
@@ -51,6 +54,9 @@ function init() {
   ctx = canvas.getContext("2d");
   patternCanvas = document.getElementById("patternCanvas");
   patternCtx = patternCanvas.getContext("2d");
+
+  highScore = parseInt(localStorage.getItem("stackOverflownHighScore"), 10) || 0;
+  document.getElementById("high-score").textContent = highScore;
 
   // Initialize empty board
   board = Array(ROWS)
@@ -269,6 +275,12 @@ function checkPatternMatch() {
       if (matchesPattern(startRow, startCol)) {
         clearPattern(startRow, startCol);
         score += 100;
+        patternsCleared++;
+        if (patternsCleared % 5 === 0) {
+          level++;
+          dropInterval = Math.max(200, 1000 - (level - 1) * 100);
+          document.getElementById("level").textContent = level;
+        }
         updateScore();
         setNewTargetPattern();
         return;
@@ -307,6 +319,12 @@ function clearPattern(startRow, startCol) {
 // Update score display
 function updateScore() {
   document.getElementById("score").textContent = score;
+
+  if (score > highScore) {
+    highScore = score;
+    document.getElementById("high-score").textContent = highScore;
+    localStorage.setItem("stackOverflownHighScore", highScore);
+  }
 }
 
 // Handle keyboard input
@@ -345,7 +363,10 @@ function handleKeyPress(e) {
 // Toggle pause
 function togglePause() {
   isPaused = !isPaused;
-  document.getElementById("status").textContent = isPaused ? "Paused" : "Playing...";
+  const status = document.getElementById("status");
+  if (status) {
+    status.textContent = isPaused ? "Paused" : "Playing...";
+  }
 }
 
 // End game
