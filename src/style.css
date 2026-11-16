@@ -71,7 +71,8 @@ canvas {
   padding-bottom: 5px;
 }
 
-.score {
+.score,
+.high-score {
   font-size: 2em;
   color: #ce9178;
   font-weight: bold;
